@@ -60,6 +60,10 @@ class ProfileComponent extends BaseComponent
 
             $this->view->canUse2fa = $this->profiles->packagesData->canUse2fa;
 
+            $this->view->countries = $this->basepackages->geoCountries->geoCountries;
+
+            $this->view->timezones = $this->basepackages->geoTimezones->geoTimezones;
+
             $apis = $this->api->getApiInfo(false, true);
             $passwordApis = [];
             if ($apis && count($apis) > 0) {
@@ -70,6 +74,15 @@ class ProfileComponent extends BaseComponent
                 }
             }
             $this->view->passwordApis = msort($passwordApis, 'id');
+
+            $accountEnv = $this->basepackages->accounts->checkEnv($this->access->auth->account()['id'], false, false, true);
+            if ($accountEnv && isset($accountEnv['params'][$this->apps->getAppInfo()['id']])) {
+                $accountEnv = $accountEnv['params'][$this->apps->getAppInfo()['id']];
+            } else {
+                $accountEnv = [];
+            }
+
+            $this->view->accountEnv = $accountEnv;
         } else {
             return;
         }
@@ -182,6 +195,18 @@ class ProfileComponent extends BaseComponent
         $this->requestIsPost();
 
         $this->basepackages->accounts->removeAccountAgents($this->postData());
+
+        $this->addResponse(
+            $this->basepackages->accounts->packagesData->responseMessage,
+            $this->basepackages->accounts->packagesData->responseCode
+        );
+    }
+
+    public function removeEnvRouteParamsAction()
+    {
+        $this->requestIsPost();
+
+        $this->basepackages->accounts->removeEnvRouteParams($this->postData());
 
         $this->addResponse(
             $this->basepackages->accounts->packagesData->responseMessage,
