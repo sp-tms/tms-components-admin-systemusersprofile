@@ -64,7 +64,7 @@ class ProfileComponent extends BaseComponent
 
             $this->view->timezones = $this->basepackages->geoTimezones->geoTimezones;
 
-            $apis = $this->api->getApiInfo(false, true);
+            $apis = $this->api->init(true)->getApiInfo(false, true);
             $passwordApis = [];
             if ($apis && count($apis) > 0) {
                 foreach ($apis as $apiKey => $api) {
